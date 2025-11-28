@@ -1,6 +1,6 @@
 {
   "name": "strapi-webhook-proxy-creator",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Automatically create a GitHub Webhook Proxy for Strapi to trigger GitHub Actions on content changes.",
   "main": "bin/index.js",
   "repository": {
@@ -11,7 +11,8 @@
     "strapi-webhook-proxy-creator": "./bin/index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [
     "strapi",
@@ -24,5 +25,9 @@
   "license": "ISC",
   "dependencies": {
     "@inquirer/prompts": "^8.0.1"
+  },
+  "devDependencies": {
+    "@types/koa": "^3.0.1",
+    "vitest": "^4.0.14"
   }
 }
