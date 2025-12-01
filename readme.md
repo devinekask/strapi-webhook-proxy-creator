@@ -19,6 +19,8 @@ Run this command inside your Strapi project root:
 npx strapi-webhook-proxy-creator
 ```
 
+![Terminal demo](demo.gif)
+
 ### What happens next?
 
 After running the tool, you need to configure your environment variables. (Probably on your hosting platform, e.g., Strapi Cloud, Heroku, etc.)
