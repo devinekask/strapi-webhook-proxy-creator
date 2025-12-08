@@ -1,8 +1,17 @@
-import { describe, it, expect, vi, beforeAll, afterAll } from "vitest";
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeAll,
+  afterAll,
+  beforeEach,
+  afterEach,
+} from "vitest";
 import path from "path";
 import fs from "fs";
 import os from "os";
-import { setup } from "../lib/setup";
+import { setup, isStrapiProject } from "../lib/setup";
 
 // Mock @inquirer/prompts
 vi.mock("@inquirer/prompts", () => ({
@@ -14,6 +23,66 @@ vi.mock("child_process", () => ({
   execSync: vi.fn(),
 }));
 
+describe("isStrapiProject", () => {
+  let tempDir;
+
+  beforeEach(() => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "strapi-check-"));
+  });
+
+  afterEach(() => {
+    if (tempDir && fs.existsSync(tempDir)) {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it("should return false when package.json doesn't exist", () => {
+    expect(isStrapiProject(tempDir)).toBe(false);
+  });
+
+  it("should return false when @strapi/strapi is not in dependencies", () => {
+    const packageJson = {
+      name: "test-project",
+      dependencies: {},
+    };
+    fs.writeFileSync(
+      path.join(tempDir, "package.json"),
+      JSON.stringify(packageJson)
+    );
+    expect(isStrapiProject(tempDir)).toBe(false);
+  });
+
+  it("should return false when src/index.ts doesn't exist", () => {
+    const packageJson = {
+      name: "test-project",
+      dependencies: {
+        "@strapi/strapi": "^5.0.0",
+      },
+    };
+    fs.writeFileSync(
+      path.join(tempDir, "package.json"),
+      JSON.stringify(packageJson)
+    );
+    expect(isStrapiProject(tempDir)).toBe(false);
+  });
+
+  it("should return true when both @strapi/strapi and src/index.ts exist", () => {
+    const packageJson = {
+      name: "test-project",
+      dependencies: {
+        "@strapi/strapi": "^5.0.0",
+      },
+    };
+    fs.writeFileSync(
+      path.join(tempDir, "package.json"),
+      JSON.stringify(packageJson)
+    );
+    fs.mkdirSync(path.join(tempDir, "src"));
+    fs.writeFileSync(path.join(tempDir, "src/index.ts"), "");
+    expect(isStrapiProject(tempDir)).toBe(true);
+  });
+});
+
 describe("setup", () => {
   let tempDir;
   const templatesDir = path.join(__dirname, "../templates");
@@ -22,6 +91,18 @@ describe("setup", () => {
     // Create a temporary directory for the test project
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "strapi-test-"));
     console.log(`Testing in temp dir: ${tempDir}`);
+
+    // Create package.json with @strapi/strapi dependency
+    const packageJson = {
+      name: "test-strapi-project",
+      dependencies: {
+        "@strapi/strapi": "^5.0.0",
+      },
+    };
+    fs.writeFileSync(
+      path.join(tempDir, "package.json"),
+      JSON.stringify(packageJson)
+    );
 
     // Create a dummy src/index.ts to simulate a Strapi project
     const srcDir = path.join(tempDir, "src");
