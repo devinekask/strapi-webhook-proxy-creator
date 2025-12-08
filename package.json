@@ -1,6 +1,6 @@
 {
   "name": "strapi-webhook-proxy-creator",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Automatically create a GitHub Webhook Proxy for Strapi to trigger GitHub Actions on content changes.",
   "main": "bin/index.js",
   "repository": {
